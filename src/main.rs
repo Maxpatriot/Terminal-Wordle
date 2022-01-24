@@ -7,26 +7,29 @@ fn file_to_vec(filename: &str) -> std::io::Result<Vec<String>> {
 fn main() {
     use colored::Colorize;
 
+    // ctrlc::set_handler(move || {
+    //     println!("received Ctrl+C!");
+    // }).expect("Error setting Ctrl-C handler");
+
     let possible_words: Vec<String> = file_to_vec("wordle-answers-alphabetical.txt").expect("couldn't load words from file");
     let possible_guess: Vec<String> = file_to_vec("wordle-allowed-guesses.txt").expect("couldn't load guesses from file");
 
     let mut random_gen = rand::thread_rng();
     let random_num: usize = rand::Rng::gen_range(&mut random_gen, 0..possible_words.len());
 
-    let word = possible_words[random_num].clone();
+    let mut word = possible_words[random_num].to_owned();
     
-    // unimplemented function that allows setting of word to cmd line arg
-    // let mut args: Vec<String> = std::env::args().collect();
-    // args.push("wince".to_string());
+    //unimplemented function that allows setting of word to cmd line arg
+    let args: Vec<String> = std::env::args().collect();
 
-    // if args[1].len() != 5 {
-    //     core::panic!("Wrong length of word in arg");
-    // }
+    if args.len() > 1 && args[1].len() == 5 {
+        word = args[1].to_owned();
+    }
 
-    // println!("{}", word);
+    //println!("{}", word);
 
     for i in 1..=6 {
-        let mut word_vec: Vec<char> = word.chars().collect();
+        let mut word_vec: Vec<char> = word.chars().into_iter().collect();
         println!("Guess number {}:", i);
         let mut user_guess:String;
         loop {
@@ -34,11 +37,11 @@ fn main() {
             std::io::stdin().read_line(&mut user_guess).expect("error reading line");
             user_guess = user_guess.trim().to_string();
             if user_guess.len() == 5 {
-                if possible_guess.contains(&user_guess) || possible_words.contains(&user_guess){
+                if possible_guess.contains(&user_guess) || possible_words.contains(&user_guess) || user_guess == word{
                     break;
                 }
             }
-            println!("Invalid word! Try again")
+            println!("{}", "Invalid word! Try again".red());
         }
         let guess_arr = user_guess.trim().chars();
         let mut index = 0;
@@ -51,16 +54,18 @@ fn main() {
                 }
                 //removes the ch from the guess list to avoid dupes
                 let index = word_vec.iter().position(|x| *x == ch).unwrap();
-                word_vec.remove(index);
+                word_vec[index] = '.';
             } else {
                 print!("{} ", ch);
-                index += 1;
             }
+            index += 1;
         }
         println!();
         if user_guess == word{
             return;
         }
     }
+    
     println!("{}", word.to_uppercase().bold().red());
+    
 }

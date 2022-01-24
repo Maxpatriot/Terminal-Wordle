@@ -2,6 +2,12 @@
 name = "wordle"
 version = "0.1.0"
 edition = "2021"
+authors = ["Maximilian Deitrick <maxpatriot@tamu.edu>"]
+license = "MIT OR Apache-2.0"
+description = "Wordle directly in your browser and offline. Same rules, 5 letters, 6 guesses, 1 correct answer"
+documentation = "https://github.com/Maxpatriot/Terminal-Wordle"
+homepage = "https://github.com/Maxpatriot/Terminal-Wordle"
+repository = "https://github.com/Maxpatriot/Terminal-Wordle"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
