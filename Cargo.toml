@@ -8,6 +8,7 @@ description = "Wordle directly in your browser and offline. Same rules, 5 letter
 documentation = "https://github.com/Maxpatriot/Terminal-Wordle"
 homepage = "https://github.com/Maxpatriot/Terminal-Wordle"
 repository = "https://github.com/Maxpatriot/Terminal-Wordle"
+keywords = ["Games", "Wordle", "Fun"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

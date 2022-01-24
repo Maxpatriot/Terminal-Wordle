@@ -1,3 +1,5 @@
+// Using filename will return a vector<String> where each string is a different line in the file
+// Uses Result to check if file can be read, else return Err
 fn file_to_vec(filename: &str) -> std::io::Result<Vec<String>> { 
     let file_in = std::fs::File::open(filename)?; 
     let file_reader = std::io::BufReader::new(file_in); 
@@ -5,37 +7,48 @@ fn file_to_vec(filename: &str) -> std::io::Result<Vec<String>> {
 } 
 
 fn main() {
+    // Import used for coloring output to save redundency
     use colored::Colorize;
 
-    // ctrlc::set_handler(move || {
-    //     println!("received Ctrl+C!");
-    // }).expect("Error setting Ctrl-C handler");
-
+    // Loads both all possible words all valid guesses
     let possible_words: Vec<String> = file_to_vec("wordle-answers-alphabetical.txt").expect("couldn't load words from file");
     let possible_guess: Vec<String> = file_to_vec("wordle-allowed-guesses.txt").expect("couldn't load guesses from file");
+    
+    // UNIMPLEMENTED
+    // 2 vectors to store all letters and all currently guessed letters
+    // let _all_letters = vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+    // let mut guessed_letters: Vec<char> = Vec::new();
 
+    // Uses rand crate to first create a generator and then use said generator to create a usize between 0 and possible guesses
     let mut random_gen = rand::thread_rng();
     let random_num: usize = rand::Rng::gen_range(&mut random_gen, 0..possible_words.len());
 
+    // If args[1] present and is of valid length replace the randomly generated word, else use the random word
     let mut word = possible_words[random_num].to_owned();
-    
-    //unimplemented function that allows setting of word to cmd line arg
     let args: Vec<String> = std::env::args().collect();
-
     if args.len() > 1 && args[1].len() == 5 {
         word = args[1].to_owned();
     }
 
-    //println!("{}", word);
+    // DEBUGGING
+    // println!("{}", word);
 
+    // Loops 6 times for each guess in the game, will break if player guesses above word
     for i in 1..=6 {
+        // word_vec is mut'd later so it needs to be redefined each loop
         let mut word_vec: Vec<char> = word.chars().into_iter().collect();
+
         println!("Guess number {}:", i);
+
+        // Defines buffer to be used by stdin() and used after loop below
         let mut user_guess:String;
         loop {
+            // Promt user for 5 letter word and loads into user_guess
             user_guess = String::new();
             std::io::stdin().read_line(&mut user_guess).expect("error reading line");
             user_guess = user_guess.trim().to_string();
+
+            // Checks that the user_guess is valid, if not reprompt user
             if user_guess.len() == 5 {
                 if possible_guess.contains(&user_guess) || possible_words.contains(&user_guess) || user_guess == word{
                     break;
@@ -43,21 +56,31 @@ fn main() {
             }
             println!("{}", "Invalid word! Try again".red());
         }
+
+        // seperate the user guess into a Vec<chars> to later itterate
         let guess_arr = user_guess.trim().chars();
+        
+        // NEED TO CHANGE, uses index to determine if pos of guessed letter is correct in for loop
         let mut index = 0;
         for ch in guess_arr {
+            // Print out the char according to if the letter / position is correct
             if word_vec.contains(&ch){
                 if word_vec[index] == ch {
                     print!("{} ", ch.to_string().green());
                 } else {
                     print!("{} ", ch.to_string().yellow());
                 }
-                //removes the ch from the guess list to avoid dupes
-                let index = word_vec.iter().position(|x| *x == ch).unwrap();
+                // replaces word_vec[index] with a char that is not present in ANY valid guess
                 word_vec[index] = '.';
             } else {
                 print!("{} ", ch);
             }
+
+            // UNIMPLEMENTED
+            // pushes unguessed letters into the guessed_letters vector
+            // if guessed_letters.contains(&ch){
+            //     guessed_letters.push(ch);
+            // }
             index += 1;
         }
         println!();
