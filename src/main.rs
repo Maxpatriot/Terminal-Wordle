@@ -70,7 +70,7 @@ fn main() {
         for (ch, status) in &mut guess_arr {
             let curr = index.next().unwrap();
             if curr == ch {
-                println!("{}, match", ch);
+                //println!("{}, match", ch);
                 *status = 2;
                 *curr = '.';
             }
@@ -79,8 +79,7 @@ fn main() {
         // second itteration checks if any remaining letters are present in word
         for (ch, status) in &mut guess_arr {
             if word_vec.contains(ch) && *status != 2{
-                print!("{}, found", ch);
-
+                //print!("{}, found", ch);
                 *status = 1;
             }
         }
