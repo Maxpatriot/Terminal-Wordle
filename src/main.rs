@@ -79,8 +79,9 @@ fn main() {
         // second itteration checks if any remaining letters are present in word
         for (ch, status) in &mut guess_arr {
             if word_vec.contains(ch) && *status != 2{
-                //print!("{}, found", ch);
                 *status = 1;
+                let i = word_vec.iter().position(|&r| r == *ch).unwrap();
+                word_vec[i] = '.';
             }
         }
 
