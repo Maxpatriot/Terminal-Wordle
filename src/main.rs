@@ -36,6 +36,8 @@ fn main() {
     // Loops 6 times for each guess in the game, will break if player guesses above word
     for i in 1..=6 {
         // word_vec is mut'd later so it needs to be redefined each loop
+
+        // let mut word_vec: Vec<char> = word.chars().into_iter().collect();
         let mut word_vec: Vec<char> = word.chars().into_iter().collect();
 
         println!("Guess number {}:", i);
@@ -46,7 +48,7 @@ fn main() {
             // Promt user for 5 letter word and loads into user_guess
             user_guess = String::new();
             std::io::stdin().read_line(&mut user_guess).expect("error reading line");
-            user_guess = user_guess.trim().to_string();
+            user_guess = user_guess.trim().to_string().to_lowercase();
 
             // Checks that the user_guess is valid, if not reprompt user
             if user_guess.len() == 5 {
@@ -58,33 +60,45 @@ fn main() {
         }
 
         // seperate the user guess into a Vec<chars> to later itterate
-        let guess_arr = user_guess.trim().chars();
-        
-        // NEED TO CHANGE, uses index to determine if pos of guessed letter is correct in for loop
-        let mut index = 0;
-        for ch in guess_arr {
-            // Print out the char according to if the letter / position is correct
-            if word_vec.contains(&ch){
-                if word_vec[index] == ch {
-                    print!("{} ", ch.to_string().green());
-                } else {
-                    print!("{} ", ch.to_string().yellow());
-                }
-                // replaces word_vec[index] with a char that is not present in ANY valid guess
-                word_vec[index] = '.';
-            } else {
-                print!("{} ", ch);
-            }
-
-            // UNIMPLEMENTED
-            // pushes unguessed letters into the guessed_letters vector
-            // if guessed_letters.contains(&ch){
-            //     guessed_letters.push(ch);
-            // }
-            index += 1;
+        let mut guess_arr: Vec<(char, usize)> = Vec::new();
+        for c in user_guess.chars() {
+            guess_arr.push((c, 0));
         }
+
+        // first itteration checks if any letters are in the correct position
+        let mut index = word_vec.iter_mut();
+        for (ch, status) in &mut guess_arr {
+            let curr = index.next().unwrap();
+            if curr == ch {
+                println!("{}, match", ch);
+                *status = 2;
+                *curr = '.';
+            }
+        }
+
+        // second itteration checks if any remaining letters are present in word
+        for (ch, status) in &mut guess_arr {
+            if word_vec.contains(ch) && *status != 2{
+                print!("{}, found", ch);
+
+                *status = 1;
+            }
+        }
+
+        // third itteration prints out letters according to second value in tuple
+        for (ch, status) in guess_arr {
+            if status == 2 {
+                print!("{} ", ch.to_ascii_uppercase().to_string().green());
+            } else if status == 1 {
+                print!("{} ", ch.to_ascii_uppercase().to_string().yellow());
+            } else {
+                print!("{} ", ch.to_ascii_uppercase());
+            }
+        }
+        
         println!();
-        if user_guess == word{
+
+        if word == user_guess {
             return;
         }
     }
