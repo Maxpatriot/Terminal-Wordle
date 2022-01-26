@@ -14,24 +14,43 @@ fn main() {
     let possible_words: Vec<String> = file_to_vec("wordle-answers-alphabetical.txt").expect("couldn't load words from file");
     let possible_guess: Vec<String> = file_to_vec("wordle-allowed-guesses.txt").expect("couldn't load guesses from file");
     
+    // clears terminal before the program starts
+    print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+
     // UNIMPLEMENTED
     // 2 vectors to store all letters and all currently guessed letters
-    // let _all_letters = vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
-    // let mut guessed_letters: Vec<char> = Vec::new();
+    let _all_letters = vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+    let mut guessed_letters: Vec<char> = Vec::new();
 
     // Uses rand crate to first create a generator and then use said generator to create a usize between 0 and possible guesses
     let mut random_gen = rand::thread_rng();
     let random_num: usize = rand::Rng::gen_range(&mut random_gen, 0..possible_words.len());
 
-    // If args[1] present and is of valid length replace the randomly generated word, else use the random word
     let mut word = possible_words[random_num].to_owned();
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() > 1 && args[1].len() == 5 {
-        word = args[1].to_owned();
+
+    println!("Welcome to {}\n", "WORDLE".magenta().bold());
+    
+
+    let args = std::env::args();
+    let mut word_check = false;
+    for arg in args {
+        if word_check && arg.len() == 5{
+            word = arg
+        }else if arg == "-help" || arg == "-h" {
+            println!("{}", "========HELP===================================================================================".bright_cyan());
+            println!("Guess 5 letter words to try and find the answer.
+If the letter appears in {}, that means it is the correct letter in the correct position.
+If the letter appears in {}, that means it is the correct letter in the incorrect position.
+And if the letter is White, that means it does not appear in the word.
+You have 6 guesses to get it right, so use all your previous guesses to make your best guess.
+Good Luck -MD\n{}\n", "GREEN".green(), "YELLOW".yellow(), "===============================================================================================".bright_cyan());
+        }else if arg == "-o" {
+            word_check = true;
+            continue;
+        }
     }
 
-    // DEBUGGING
-    // println!("{}", word);
+    //println!("{}", word);
 
     // Loops 6 times for each guess in the game, will break if player guesses above word
     for i in 1..=6 {
@@ -94,15 +113,18 @@ fn main() {
             } else {
                 print!("{} ", ch.to_ascii_uppercase());
             }
+            if guessed_letters.contains(&ch) {
+                guessed_letters.push(ch);
+            }
         }
         
         println!();
 
+        // Win Condition
         if word == user_guess {
             return;
         }
     }
-    
-    println!("{}", word.to_uppercase().bold().red());
-    
+    // Lose Condition
+    println!("{}", word.to_uppercase().bold().red()); 
 }
